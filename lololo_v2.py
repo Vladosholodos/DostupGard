@@ -138,7 +138,7 @@ def add_data_to_database(data):
             cursor = connection.cursor()
 
             # SQL-запрос для вставки данных
-            insert_query = "INSERT INTO u (время, idu) VALUES (%s, %s)"
+            insert_query = "INSERT INTO work_information (Время, Событие) VALUES (%s, %s)"
             current_time = QDateTime.currentDateTime().toString("yyyy-MM-dd HH:mm:ss")
             data_to_insert = (current_time, data)
 
