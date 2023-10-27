@@ -1,6 +1,7 @@
 import sys
 import threading
 import mysql.connector
+import serial
 from mysql.connector import Error
 from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidgetItem, QDialog, QComboBox
 from PyQt5.QtCore import QDateTime
@@ -59,6 +60,7 @@ class MyWindow(QMainWindow):
                 self.add_to_list(line)
                 # Добавляем данные в базу данных при каждом событии
                 add_data_to_database(line)
+                print(line)
 
     def add_to_list(self, data):
         current_time = QDateTime.currentDateTime().toString("yyyy-MM-dd HH:mm:ss")
@@ -136,9 +138,9 @@ def add_data_to_database(data):
             cursor = connection.cursor()
 
             # SQL-запрос для вставки данных
-            insert_query = "INSERT INTO u (event, timestamp) VALUES (%s, %s)"
+            insert_query = "INSERT INTO u (время, idu) VALUES (%s, %s)"
             current_time = QDateTime.currentDateTime().toString("yyyy-MM-dd HH:mm:ss")
-            data_to_insert = (data, current_time)
+            data_to_insert = (current_time, data)
 
             # Выполнение запроса
             cursor.execute(insert_query, data_to_insert)

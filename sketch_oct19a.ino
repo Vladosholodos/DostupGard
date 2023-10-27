@@ -32,7 +32,7 @@ void loop() {
 
 
   if (content.substring(1) == "33 D1 0C F8") {
-    Serial.println("Доступ разрешен!");
+    Serial.println("33 D1 0C F8");
     // Добавьте здесь код для разрешения доступа (например, открытие замка)
   } else {
     Serial.println("Доступ запрещен!");
