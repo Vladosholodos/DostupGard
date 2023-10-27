@@ -1,7 +1,7 @@
 import sys
 import threading
-
-import serial
+import mysql.connector
+from mysql.connector import Error
 from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidgetItem, QDialog, QComboBox
 from PyQt5.QtCore import QDateTime
 from interfaceProgram import Ui_MainWindow
@@ -57,6 +57,8 @@ class MyWindow(QMainWindow):
             line = self.serial_port.readline().decode().strip()
             if line and self.can_add_to_list:
                 self.add_to_list(line)
+                # Добавляем данные в базу данных при каждом событии
+                add_data_to_database(line)
 
     def add_to_list(self, data):
         current_time = QDateTime.currentDateTime().toString("yyyy-MM-dd HH:mm:ss")
@@ -86,19 +88,18 @@ class SettingsDialog(QDialog):
         self.ui.theme_combobox.currentIndexChanged.connect(self.change_theme)
         config = configparser.ConfigParser()
         config.read('config.ini')
-        theme_type = config.get('Theme', 'theme', fallback='0')  # Чтение типа темы (светлая или темная)
-        background_color = config.get('Theme', 'Background_Color', fallback='#FFFFFF')  # Чтение цвета фона
-        text_color = config.get('Theme', 'Text_Color', fallback='#000000')  # Чтение цвета текста
-        self.ui.theme_combobox.setCurrentText("Светлая" if 'theme' == 0 else "Темная")
+        theme_type = config.get('Theme', 'theme', fallback='0')
+        background_color = config.get('Theme', 'Background_Color', fallback='#FFFFFF')
+        text_color = config.get('Theme', 'Text_Color', fallback='#000000')
+        self.ui.theme_combobox.setCurrentText("Светлая" if theme_type == '0' else "Темная")
         self.apply_theme(theme_type, background_color, text_color)
         MyWindow.apply_theme(parent)
 
     def change_theme(self, index):
-        theme = index if index == 0 else "1"
-        background_color = "#A8D7E6" if index == theme else '#333333'
-        text_color = '#000000' if index == theme else '#FFFFFF'
+        theme = '0' if index == 0 else '1'
+        background_color = "#A8D7E6" if theme == '0' else '#333333'
+        text_color = '#000000' if theme == '0' else '#FFFFFF'
         self.apply_theme(theme, background_color, text_color)
-
 
     def apply_theme(self, theme, background_color, text_color):
         theme = theme
@@ -108,17 +109,50 @@ class SettingsDialog(QDialog):
         self.setStyleSheet(f"background-color: {background_color}; color: {text_color};")
         self.ui.theme_combobox.setStyleSheet(f"background-color: {background_color}; color: {text_color};")
         self.ui.Language_Box.setStyleSheet(f"background-color: {background_color}; color: {text_color};")
-        theme = "0" if theme == 0 else "1"
+        theme = "0" if theme == '0' else "1"
 
         # Сохранить настройки в файл config.ini
         config = configparser.ConfigParser()
         config['Theme'] = {
-            'index': theme,
-            'background_color': background_color,
-            'text_color': text_color
+            'theme': theme,
+            'Background_Color': background_color,
+            'Text_Color': text_color
         }
         with open('config.ini', 'w') as configfile:
             config.write(configfile)
+
+
+def add_data_to_database(data):
+    try:
+        # Подключение к базе данных
+        connection = mysql.connector.connect(
+            host='localhost',
+            user='root',
+            password='Bigdick25sm!',
+            database='test'  # Название вашей базы данных
+        )
+
+        if connection.is_connected():
+            cursor = connection.cursor()
+
+            # SQL-запрос для вставки данных
+            insert_query = "INSERT INTO u (event, timestamp) VALUES (%s, %s)"
+            current_time = QDateTime.currentDateTime().toString("yyyy-MM-dd HH:mm:ss")
+            data_to_insert = (data, current_time)
+
+            # Выполнение запроса
+            cursor.execute(insert_query, data_to_insert)
+            connection.commit()
+            print("Данные успешно добавлены в базу данных")
+
+    except Error as e:
+        print(f"Ошибка: {e}")
+
+    finally:
+        if connection.is_connected():
+            cursor.close()
+            connection.close()
+            print("Подключение к базе данных закрыто")
 
 
 if __name__ == "__main__":
