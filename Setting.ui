@@ -1,0 +1,284 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>Setting</class>
+ <widget class="QDialog" name="Setting">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>240</width>
+    <height>131</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="minimumSize">
+   <size>
+    <width>240</width>
+    <height>131</height>
+   </size>
+  </property>
+  <property name="maximumSize">
+   <size>
+    <width>240</width>
+    <height>131</height>
+   </size>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">/* Стиль градиента для фона */
+background: qradialgradient(cx: 0.5, cy: 0.5, fx: 0.5, fy: 0.5, radius: 1.5, stop: 0 rgba(173, 216, 230, 255), stop: 1 rgba(144, 202, 249, 255));
+
+/* Стиль текста */
+color: #333; /* Темный цвет текста для лучшей читаемости на светлом фоне */
+</string>
+  </property>
+  <widget class="QComboBox" name="theme_combobox">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>70</y>
+     <width>125</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>125</width>
+     <height>31</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <family>Georgia</family>
+     <pointsize>10</pointsize>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+     <stylestrategy>PreferDefault</stylestrategy>
+    </font>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="accessibleName">
+    <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;гнепш&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::RightToLeft</enum>
+   </property>
+   <property name="autoFillBackground">
+    <bool>false</bool>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">/* Стиль QComboBox */
+QComboBox {
+    border: 1px solid #ccc; /* Граничная линия */
+    border-radius: 5px; /* Скругление углов */
+    padding: 5px; /* Отступ внутри ComboBox */
+	/* Цвета для светлой темы */
+	background: qradialgradient(cx: 0.5, cy: 0.5, fx: 0.5, fy: 0.5, radius: 1.5, 		stop: 0 rgba(173, 216, 230, 255), stop: 1 rgba(144, 202, 249, 255));
+    selection-background-color: #B0E57C; /* Цвет выделения */
+}
+
+/* Стиль QComboBox в раскрытом состоянии */
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    border-radius: 5px; /* Скругление углов */
+    width: 25px; /* Ширина кнопки раскрытия списка */
+    border-left-width: 1px; /* Ширина граничной линии слева от кнопки */
+    border-left-color: #ccc; /* Цвет граничной линии */
+    border-left-style: solid;
+}
+
+/* Стиль элементов в раскрывающемся списке (выбранный элемент) */
+QComboBox QAbstractItemView {
+    border: 1px solid #ccc; /* Граничная линия для элементов в списке */
+    border-radius: 5px; /* Скругление углов элементов в списке */
+}
+
+/* Стиль выбранного элемента в раскрывающемся списке */
+QComboBox QAbstractItemView::item {
+	/* Цвета для светлой темы */
+	background: #fff;
+}
+</string>
+   </property>
+   <property name="inputMethodHints">
+    <set>Qt::ImhNone</set>
+   </property>
+   <property name="editable">
+    <bool>false</bool>
+   </property>
+   <property name="currentText">
+    <string notr="true">Темная</string>
+   </property>
+   <property name="currentIndex">
+    <number>1</number>
+   </property>
+   <property name="sizeAdjustPolicy">
+    <enum>QComboBox::AdjustToContents</enum>
+   </property>
+   <item>
+    <property name="text">
+     <string notr="true">Светлая</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string notr="true">Темная</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>161</x>
+     <y>70</y>
+     <width>52</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Georgia</family>
+     <pointsize>10</pointsize>
+     <italic>false</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string>Тема</string>
+   </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="Language_Box">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>30</y>
+     <width>125</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>125</width>
+     <height>31</height>
+    </size>
+   </property>
+   <property name="font">
+    <font>
+     <family>Georgia</family>
+     <pointsize>10</pointsize>
+     <italic>false</italic>
+     <underline>false</underline>
+     <strikeout>false</strikeout>
+     <stylestrategy>PreferDefault</stylestrategy>
+    </font>
+   </property>
+   <property name="cursor">
+    <cursorShape>ArrowCursor</cursorShape>
+   </property>
+   <property name="layoutDirection">
+    <enum>Qt::RightToLeft</enum>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">/* Стиль QComboBox */
+QComboBox {
+    border: 1px solid #ccc; /* Граничная линия */
+    border-radius: 5px; /* Скругление углов */
+    padding: 5px; /* Отступ внутри ComboBox */
+	/* Цвета для светлой темы */
+	background: qradialgradient(cx: 0.5, cy: 0.5, fx: 0.5, fy: 0.5, radius: 1.5, 		stop: 0 rgba(173, 216, 230, 255), stop: 1 rgba(144, 202, 249, 255));
+    selection-background-color: #B0E57C; /* Цвет выделения */
+}
+
+/* Стиль QComboBox в раскрытом состоянии */
+QComboBox::drop-down {
+    subcontrol-origin: padding;
+    subcontrol-position: top right;
+    border-radius: 5px; /* Скругление углов */
+    width: 25px; /* Ширина кнопки раскрытия списка */
+    border-left-width: 1px; /* Ширина граничной линии слева от кнопки */
+    border-left-color: #ccc; /* Цвет граничной линии */
+    border-left-style: solid;
+}
+
+/* Стиль элементов в раскрывающемся списке (выбранный элемент) */
+QComboBox QAbstractItemView {
+    border: 1px solid #ccc; /* Граничная линия для элементов в списке */
+    border-radius: 5px; /* Скругление углов элементов в списке */
+}
+
+/* Стиль выбранного элемента в раскрывающемся списке */
+QComboBox QAbstractItemView::item {
+	/* Цвета для светлой темы */
+	background: #fff;
+}
+</string>
+   </property>
+   <property name="inputMethodHints">
+    <set>Qt::ImhNone</set>
+   </property>
+   <item>
+    <property name="text">
+     <string>Руский</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Английский</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Испанский</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Французский</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Немецкий</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>160</x>
+     <y>30</y>
+     <width>53</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Georgia</family>
+     <pointsize>10</pointsize>
+     <italic>false</italic>
+    </font>
+   </property>
+   <property name="text">
+    <string>Язык</string>
+   </property>
+   <property name="margin">
+    <number>0</number>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
