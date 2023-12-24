@@ -200,6 +200,9 @@ class Ui_MainWindow(object):
         font.setFamily("Georgia")
         font.setItalic(False)
         MainWindow.setFont(font)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("Лого.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        MainWindow.setWindowIcon(icon)
         MainWindow.setStyleSheet("/* Стиль градиента для фона */\n"
 "background: qradialgradient(cx: 0.5, cy: 0.5, fx: 0.5, fy: 0.5, radius: 1.5, stop: 0 rgba(173, 216, 230, 255), stop: 1 rgba(144, 202, 249, 255));\n"
 "\n"
@@ -218,13 +221,13 @@ class Ui_MainWindow(object):
         self.listWidget.setMaximumSize(QtCore.QSize(401, 192))
         self.listWidget.setStyleSheet("")
         self.listWidget.setObjectName("listWidget")
-        self.widget = QtWidgets.QWidget(self.centralwidget)
-        self.widget.setGeometry(QtCore.QRect(10, 10, 401, 29))
-        self.widget.setObjectName("widget")
-        self.horizontalLayout = QtWidgets.QHBoxLayout(self.widget)
+        self.layoutWidget = QtWidgets.QWidget(self.centralwidget)
+        self.layoutWidget.setGeometry(QtCore.QRect(11, 10, 391, 29))
+        self.layoutWidget.setObjectName("layoutWidget")
+        self.horizontalLayout = QtWidgets.QHBoxLayout(self.layoutWidget)
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout.setObjectName("horizontalLayout")
-        self.OnButt = QtWidgets.QPushButton(self.widget)
+        self.OnButt = QtWidgets.QPushButton(self.layoutWidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -237,7 +240,10 @@ class Ui_MainWindow(object):
         self.OnButt.setDefault(False)
         self.OnButt.setObjectName("OnButt")
         self.horizontalLayout.addWidget(self.OnButt)
-        self.Setting_Button = QtWidgets.QToolButton(self.widget)
+        self.stats_button = QtWidgets.QPushButton(self.layoutWidget)
+        self.stats_button.setObjectName("stats_button")
+        self.horizontalLayout.addWidget(self.stats_button)
+        self.Setting_Button = QtWidgets.QToolButton(self.layoutWidget)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -252,16 +258,7 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
-        self.OnButt.setText(_translate("MainWindow", "Запуск"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "ДоступГард"))
+        self.OnButt.setText(_translate("MainWindow", "Запустить"))
+        self.stats_button.setText(_translate("MainWindow", "Статистика"))
         self.Setting_Button.setText(_translate("MainWindow", "..."))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
-    ui = Ui_MainWindow()
-    ui.setupUi(MainWindow)
-    MainWindow.show()
-    sys.exit(app.exec_())

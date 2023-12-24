@@ -22,6 +22,9 @@ class Ui_Setting(object):
         Setting.setSizePolicy(sizePolicy)
         Setting.setMinimumSize(QtCore.QSize(240, 131))
         Setting.setMaximumSize(QtCore.QSize(240, 131))
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap("Лого.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        Setting.setWindowIcon(icon)
         Setting.setStyleSheet("/* Стиль градиента для фона */\n"
 "background: qradialgradient(cx: 0.5, cy: 0.5, fx: 0.5, fy: 0.5, radius: 1.5, stop: 0 rgba(173, 216, 230, 255), stop: 1 rgba(144, 202, 249, 255));\n"
 "\n"
@@ -142,9 +145,6 @@ class Ui_Setting(object):
         self.Language_Box.setObjectName("Language_Box")
         self.Language_Box.addItem("")
         self.Language_Box.addItem("")
-        self.Language_Box.addItem("")
-        self.Language_Box.addItem("")
-        self.Language_Box.addItem("")
         self.label_3 = QtWidgets.QLabel(Setting)
         self.label_3.setGeometry(QtCore.QRect(160, 30, 53, 31))
         font = QtGui.QFont()
@@ -160,22 +160,9 @@ class Ui_Setting(object):
 
     def retranslateUi(self, Setting):
         _translate = QtCore.QCoreApplication.translate
-        Setting.setWindowTitle(_translate("Setting", "Dialog"))
+        Setting.setWindowTitle(_translate("Setting", "Настройки"))
         self.theme_combobox.setAccessibleName(_translate("Setting", "<html><head/><body><p>гнепш</p><p><br/></p></body></html>"))
         self.label_4.setText(_translate("Setting", "Тема"))
         self.Language_Box.setItemText(0, _translate("Setting", "Руский"))
         self.Language_Box.setItemText(1, _translate("Setting", "Английский"))
-        self.Language_Box.setItemText(2, _translate("Setting", "Испанский"))
-        self.Language_Box.setItemText(3, _translate("Setting", "Французский"))
-        self.Language_Box.setItemText(4, _translate("Setting", "Немецкий"))
         self.label_3.setText(_translate("Setting", "Язык"))
-
-
-if __name__ == "__main__":
-    import sys
-    app = QtWidgets.QApplication(sys.argv)
-    Setting = QtWidgets.QDialog()
-    ui = Ui_Setting()
-    ui.setupUi(Setting)
-    Setting.show()
-    sys.exit(app.exec_())

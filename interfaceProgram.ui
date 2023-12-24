@@ -555,7 +555,11 @@
    </font>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>ДоступГард</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>Лого.png</normaloff>Лого.png</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">/* Стиль градиента для фона */
@@ -591,12 +595,12 @@ color: #333; /* Темный цвет текста для лучшей чита�
      <string notr="true"/>
     </property>
    </widget>
-   <widget class="QWidget" name="">
+   <widget class="QWidget" name="layoutWidget">
     <property name="geometry">
      <rect>
-      <x>10</x>
+      <x>11</x>
       <y>10</y>
-      <width>401</width>
+      <width>391</width>
       <height>29</height>
      </rect>
     </property>
@@ -615,13 +619,20 @@ color: #333; /* Темный цвет текста для лучшей чита�
         </font>
        </property>
        <property name="text">
-        <string>Запуск</string>
+        <string>Запустить</string>
        </property>
        <property name="autoDefault">
         <bool>true</bool>
        </property>
        <property name="default">
         <bool>false</bool>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="stats_button">
+       <property name="text">
+        <string>Статистика</string>
        </property>
       </widget>
      </item>

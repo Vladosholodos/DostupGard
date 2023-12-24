@@ -1,13 +1,17 @@
+import configparser
 import sys
 import threading
+
 import mysql.connector
+import pymysql
 import serial
-from mysql.connector import Error
-from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidgetItem, QDialog, QComboBox
 from PyQt5.QtCore import QDateTime
-from interfaceProgram import Ui_MainWindow
+from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidgetItem, QDialog
+from mysql.connector import Error
+
 from Setting import Ui_Setting
-import configparser
+from Stats import Ui_stats_window
+from interfaceProgram import Ui_MainWindow
 
 
 class MyWindow(QMainWindow):
@@ -15,12 +19,13 @@ class MyWindow(QMainWindow):
         super().__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.ui.OnButt.setText("Запуск")
+        self.ui.OnButt.setText("Запустить")
         self.is_running = False
         self.can_add_to_list = False
         self.serial_port = None
         self.ui.OnButt.clicked.connect(self.toggle_reading)
         self.ui.Setting_Button.clicked.connect(self.open_settings_window)
+        self.ui.stats_button.clicked.connect(self.open_stats_window)
 
         # Применить начальные настройки темы
         self.apply_theme()
@@ -28,6 +33,10 @@ class MyWindow(QMainWindow):
     def open_settings_window(self):
         settings_dialog = SettingsDialog(self)
         settings_dialog.exec_()
+
+    def open_stats_window(self):
+        stats_window = StatsWindow(self)
+        stats_window.show()
 
     def toggle_reading(self):
         self.is_running = not self.is_running
@@ -38,7 +47,7 @@ class MyWindow(QMainWindow):
             self.can_add_to_list = True
             self.start_reading()
         else:
-            self.ui.OnButt.setText("Запуск")
+            self.ui.OnButt.setText("Запустить")
             self.stop_reading()
 
     def start_reading(self):
@@ -155,6 +164,35 @@ def add_data_to_database(data):
             cursor.close()
             connection.close()
             print("Подключение к базе данных закрыто")
+
+
+class StatsWindow(QMainWindow):
+    def __init__(self, parent=None):
+        super(StatsWindow, self).__init__(parent)
+        self.ui = Ui_stats_window()
+        self.ui.setupUi(self)
+        self.load_data_to_combobox()
+
+    def load_data_to_combobox(self):
+        # Подключаемся к базе данных
+        connection = pymysql.connect(host='localhost', user='root', password='Bigdick25sm!',
+                                     database='test')
+
+        try:
+            with connection.cursor() as cursor:
+                # Выполняем запрос к базе данных
+                cursor.execute("SELECT FIM_user FROM user_information")
+
+                # Получаем результат запроса
+                result = cursor.fetchall()
+
+                # Добавляем результат в ComboBox
+                for row in result:
+                    self.ui.comboBox.addItem(row[0])
+
+        finally:
+            # Закрываем соединение с базой данных
+            connection.close()
 
 
 if __name__ == "__main__":

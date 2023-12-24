@@ -29,7 +29,11 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>Настройки</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>Лого.png</normaloff>Лого.png</iconset>
   </property>
   <property name="styleSheet">
    <string notr="true">/* Стиль градиента для фона */
@@ -237,21 +241,6 @@ QComboBox QAbstractItemView::item {
    <item>
     <property name="text">
      <string>Английский</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Испанский</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Французский</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Немецкий</string>
     </property>
    </item>
   </widget>

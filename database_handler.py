@@ -1,3 +1,4 @@
+import mysql
 import serial
 import pymysql
 
@@ -7,20 +8,39 @@ class DatabaseHandler:
         self.connection = pymysql.connect(host=db_host, user=db_user, password=db_password, database=db_name)
         self.serial_port = serial.Serial(arduino_port, 9600)
 
-    def check_access(self, uid):
-        with self.connection.cursor() as cursor:
-            sql = f"SELECT * FROM authorized_users WHERE uid='{uid}'"
-            cursor.execute(sql)
-            result = cursor.fetchone()
+        def check_access(self, uid):
+            try:
+                # Подключение к базе данных
+                connection = mysql.connector.connect(
+                    host=self.host,
+                    user=self.user,
+                    password=self.password,
+                    database=self.database
+                )
 
-            if result:
-                return True
-            else:
+                if connection.is_connected():
+                    cursor = connection.cursor()
+
+                    # SQL-запрос для проверки доступа по UID метке
+                    select_query = "SELECT COUNT(*) FROM authorized_users WHERE uid = %s"
+                    cursor.execute(select_query, (uid,))
+
+                    # Получаем результат запроса
+                    count = cursor.fetchone()[0]
+
+                    if count > 0:
+                        print("Доступ разрешен")
+                        return True
+                    else:
+                        print("Доступ запрещен")
+                        return False
+
+            except Error as e:
+                print(f"Ошибка: {e}")
                 return False
 
-    def send_to_arduino(self, message):
-        self.serial_port.write(message.encode())
-
-    def close_connection(self):
-        self.connection.close()
-        self.serial_port.close()
+            finally:
+                if connection.is_connected():
+                    cursor.close()
+                    connection.close()
+                    print("Подключение к базе данных закрыто")
