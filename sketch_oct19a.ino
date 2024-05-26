@@ -14,19 +14,19 @@ void setup() {
 }
 
 void loop() {
-  if ( ! mfrc522.PICC_IsNewCardPresent()) {
+  if (!mfrc522.PICC_IsNewCardPresent()) {
     return;
   }
 
-  if ( ! mfrc522.PICC_ReadCardSerial()) {
+  if (!mfrc522.PICC_ReadCardSerial()) {
     return;
   }
 
   //UID метки
-  String content= "";
+  String content = "";
   for (byte i = 0; i < mfrc522.uid.size; i++) {
-     content.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " "));
-     content.concat(String(mfrc522.uid.uidByte[i], HEX));
+    content.concat(String(mfrc522.uid.uidByte[i] < 0x10 ? " 0" : " "));
+    content.concat(String(mfrc522.uid.uidByte[i], HEX));
   }
   content.toUpperCase();
 
@@ -37,5 +37,5 @@ void loop() {
   } else {
     Serial.println("Доступ запрещен!");
   }
-  delay(3000); // Ждем 3 секунды перед следующей попыткой
+  delay(3000);  // Ждем 3 секунды перед следующей попыткой
 }

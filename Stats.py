@@ -19,17 +19,20 @@ class Ui_stats_window(object):
         icon.addPixmap(QtGui.QPixmap("Лого.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         stats_window.setWindowIcon(icon)
         self.centralwidget = QtWidgets.QWidget(stats_window)
+        self.centralwidget.setEnabled(True)
         self.centralwidget.setObjectName("centralwidget")
         self.comboBox = QtWidgets.QComboBox(self.centralwidget)
+        self.comboBox.setEnabled(True)
         self.comboBox.setGeometry(QtCore.QRect(30, 20, 351, 31))
         self.comboBox.setObjectName("comboBox")
         self.pushButton = QtWidgets.QPushButton(self.centralwidget)
         self.pushButton.setGeometry(QtCore.QRect(390, 20, 111, 31))
         self.pushButton.setObjectName("pushButton")
+        self.listWidget = QtWidgets.QListWidget(self.centralwidget)
+        self.listWidget.setGeometry(QtCore.QRect(30, 80, 471, 361))
+        self.listWidget.setAutoFillBackground(False)
+        self.listWidget.setObjectName("listWidget")
         stats_window.setCentralWidget(self.centralwidget)
-        self.statusbar = QtWidgets.QStatusBar(stats_window)
-        self.statusbar.setObjectName("statusbar")
-        stats_window.setStatusBar(self.statusbar)
 
         self.retranslateUi(stats_window)
         QtCore.QMetaObject.connectSlotsByName(stats_window)
@@ -38,6 +41,3 @@ class Ui_stats_window(object):
         _translate = QtCore.QCoreApplication.translate
         stats_window.setWindowTitle(_translate("stats_window", "Статистика"))
         self.pushButton.setText(_translate("stats_window", "Статистика"))
-
-    def exec_(self):
-        pass

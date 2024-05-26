@@ -8,7 +8,7 @@ a = Analysis(
     ['lololo_v2.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('Лого.png', '.'), ('config.ini', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},

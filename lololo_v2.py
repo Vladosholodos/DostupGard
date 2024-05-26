@@ -26,6 +26,7 @@ class MyWindow(QMainWindow):
         self.ui.OnButt.clicked.connect(self.toggle_reading)
         self.ui.Setting_Button.clicked.connect(self.open_settings_window)
         self.ui.stats_button.clicked.connect(self.open_stats_window)
+        self.stats_window = None
 
         # Применить начальные настройки темы
         self.apply_theme()
@@ -138,8 +139,8 @@ def add_data_to_database(data):
         # Подключение к базе данных
         connection = mysql.connector.connect(
             host='localhost',
-            user='root',
-            password='Bigdick25sm!',
+            user='admin',
+            password='123qwe!@#QWE',
             database='test'  # Название вашей базы данных
         )
 
@@ -166,32 +167,51 @@ def add_data_to_database(data):
             print("Подключение к базе данных закрыто")
 
 
+# Статистика--------------------------------------------------
 class StatsWindow(QMainWindow):
+
     def __init__(self, parent=None):
         super(StatsWindow, self).__init__(parent)
         self.ui = Ui_stats_window()
         self.ui.setupUi(self)
         self.load_data_to_combobox()
+        self.ui.pushButton.clicked.connect(self.clickonstats)
+
+    def clickonstats(self):
+        connection = pymysql.connect(host='localhost', user='admin', password='123qwe!@#QWE',
+                                     database='test')
+        selected_user = self.ui.comboBox.currentText()
+        try:
+            with connection.cursor() as cursor:
+                query = ("SELECT Время FROM work_information "
+                         "WHERE Событие = (SELECT uid FROM user_information WHERE FIM_user = %s)")
+                cursor.execute(query, (selected_user,))
+                result = cursor.fetchall()
+
+                self.ui.listWidget.clear()  # Очистка списка перед добавлением новых элементов
+
+                for row in result:
+                    self.ui.listWidget.addItem(str(row[0]))  # Преобразуем в строку
+
+        finally:
+            connection.close()
 
     def load_data_to_combobox(self):
-        # Подключаемся к базе данных
-        connection = pymysql.connect(host='localhost', user='root', password='Bigdick25sm!',
+        connection = pymysql.connect(host='localhost', user='admin', password='123qwe!@#QWE',
                                      database='test')
 
         try:
             with connection.cursor() as cursor:
-                # Выполняем запрос к базе данных
                 cursor.execute("SELECT FIM_user FROM user_information")
 
-                # Получаем результат запроса
                 result = cursor.fetchall()
 
-                # Добавляем результат в ComboBox
+                self.ui.comboBox.clear()  # Очистка ComboBox перед добавлением новых элементов
+
                 for row in result:
                     self.ui.comboBox.addItem(row[0])
 
         finally:
-            # Закрываем соединение с базой данных
             connection.close()
 
 
