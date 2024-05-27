@@ -1,0 +1,1 @@
+pyuic5 Setting.ui -o Setting.py
