@@ -5,8 +5,9 @@ import threading
 import mysql.connector
 import pymysql
 import serial
+import datetime
 from PyQt5.QtCore import QDateTime
-from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidgetItem, QDialog
+from PyQt5.QtWidgets import QApplication, QMainWindow, QListWidgetItem, QDialog, QTableWidgetItem, QTableWidget
 from mysql.connector import Error
 
 from Setting import Ui_Setting
@@ -91,6 +92,39 @@ class MyWindow(QMainWindow):
         self.ui.Setting_Button.setStyleSheet(f"background-color: {background_color}; color: {text_color};")
 
 
+def add_data_to_database(data):
+    try:
+        # Подключение к базе данных
+        connection = mysql.connector.connect(
+            host='localhost',
+            user='admin',
+            password='123qwe!@#QWE',
+            database='test'  # Название базы данных
+        )
+
+        if connection.is_connected():
+            cursor = connection.cursor()
+
+            # SQL-запрос для вставки данных
+            insert_query = "INSERT INTO work_information (Время, Код) VALUES (%s, %s)"
+            current_time = QDateTime.currentDateTime().toString("yyyy-MM-dd HH:mm:ss")
+            data_to_insert = (current_time, data)
+
+            # Выполнение запроса
+            cursor.execute(insert_query, data_to_insert)
+            connection.commit()
+            print("Данные успешно добавлены в базу данных")
+
+    except Error as e:
+        print(f"Ошибка: {e}")
+
+    finally:
+        if connection.is_connected():
+            cursor.close()
+            connection.close()
+            print("Подключение к базе данных закрыто")
+
+
 class SettingsDialog(QDialog):
 
     def __init__(self, parent=None):
@@ -134,39 +168,6 @@ class SettingsDialog(QDialog):
             config.write(configfile)
 
 
-def add_data_to_database(data):
-    try:
-        # Подключение к базе данных
-        connection = mysql.connector.connect(
-            host='localhost',
-            user='admin',
-            password='123qwe!@#QWE',
-            database='test'  # Название вашей базы данных
-        )
-
-        if connection.is_connected():
-            cursor = connection.cursor()
-
-            # SQL-запрос для вставки данных
-            insert_query = "INSERT INTO work_information (Время, Событие) VALUES (%s, %s)"
-            current_time = QDateTime.currentDateTime().toString("yyyy-MM-dd HH:mm:ss")
-            data_to_insert = (current_time, data)
-
-            # Выполнение запроса
-            cursor.execute(insert_query, data_to_insert)
-            connection.commit()
-            print("Данные успешно добавлены в базу данных")
-
-    except Error as e:
-        print(f"Ошибка: {e}")
-
-    finally:
-        if connection.is_connected():
-            cursor.close()
-            connection.close()
-            print("Подключение к базе данных закрыто")
-
-
 # Статистика--------------------------------------------------
 class StatsWindow(QMainWindow):
 
@@ -177,22 +178,75 @@ class StatsWindow(QMainWindow):
         self.load_data_to_combobox()
         self.ui.pushButton.clicked.connect(self.clickonstats)
 
+        config = configparser.ConfigParser()
+        config.read('config.ini')
+        theme_type = config.get('Theme', 'theme', fallback='0')
+        background_color = config.get('Theme', 'Background_Color', fallback='#FFFFFF')
+        text_color = config.get('Theme', 'Text_Color', fallback='#000000')
+        self.apply_theme(theme_type, background_color, text_color)
+
+    def apply_theme(self, theme_type, background_color, text_color):
+        self.setStyleSheet(f"background-color: {background_color}; color: {text_color};")
+        self.ui.statsTable.setStyleSheet(f"""
+               QTableWidget {{
+                   background-color: {background_color};
+                   color: {text_color};
+                   gridline-color: {text_color};
+                   font-size: 14px;
+               }}
+               QHeaderView::section {{
+                   background-color: {background_color};
+                   color: {text_color};
+                   padding: 4px;
+                   font-size: 14px;
+                   font-weight: bold;
+               }}
+               QTableWidget::item {{
+                   padding: 4px;
+                   background-color: {background_color};
+                   color: {text_color};
+               }}
+           """)
+
     def clickonstats(self):
         connection = pymysql.connect(host='localhost', user='admin', password='123qwe!@#QWE',
                                      database='test')
         selected_user = self.ui.comboBox.currentText()
         try:
             with connection.cursor() as cursor:
-                query = ("SELECT Время FROM work_information "
-                         "WHERE Событие = (SELECT uid FROM user_information WHERE FIM_user = %s)")
-                cursor.execute(query, (selected_user,))
+                if selected_user == "Все":
+                    query = "SELECT Время, Код FROM work_information ORDER BY Время DESC"
+                    cursor.execute(query)
+
+                if selected_user == "Внутри":
+                    query = "SELECT FIM_user FROM user_information where Внутри = 1"
+                    cursor.execute(query)
+
+                if selected_user != "Все" and selected_user != "Внутри":
+                    query = ("SELECT Время, Код FROM work_information "
+                             "WHERE Код = (SELECT uid FROM user_information WHERE FIM_user = %s)"
+                             "ORDER BY Время DESC")
+                    cursor.execute(query, (selected_user,))
+
                 result = cursor.fetchall()
+                if selected_user == "Внутри":
+                    self.ui.statsTable.setRowCount(len(result))  # Устанавливаем количество строк
+                    self.ui.statsTable.setColumnCount(1)
+                    self.ui.statsTable.setHorizontalHeaderLabels(['Сейчас в здании общежития'])
+                    for row_index, row_data in enumerate(result):
+                        self.ui.statsTable.setItem(row_index, 0, QTableWidgetItem(str(row_data[0])))
+                else:
+                    self.ui.statsTable.setRowCount(len(result))  # Устанавливаем количество строк
+                    self.ui.statsTable.setColumnCount(2)  # Устанавливаем количество столбцов
+                    self.ui.statsTable.setHorizontalHeaderLabels(
+                        ['Время', 'Событие'])  # Устанавливаем заголовки столбцов
+                    for row_index, row_data in enumerate(result):
+                        formatted_time = datetime.datetime.strptime(str(row_data[0]), "%Y-%m-%d %H:%M:%S").strftime(
+                            "%d-%m-%Y %H:%M:%S")
+                        self.ui.statsTable.setItem(row_index, 0, QTableWidgetItem(formatted_time))
+                        self.ui.statsTable.setItem(row_index, 1, QTableWidgetItem(str(row_data[1])))
 
-                self.ui.listWidget.clear()  # Очистка списка перед добавлением новых элементов
-
-                for row in result:
-                    self.ui.listWidget.addItem(str(row[0]))  # Преобразуем в строку
-
+                self.ui.statsTable.resizeColumnsToContents()
         finally:
             connection.close()
 
@@ -203,7 +257,6 @@ class StatsWindow(QMainWindow):
         try:
             with connection.cursor() as cursor:
                 cursor.execute("SELECT FIM_user FROM user_information")
-
                 result = cursor.fetchall()
 
                 self.ui.comboBox.clear()  # Очистка ComboBox перед добавлением новых элементов

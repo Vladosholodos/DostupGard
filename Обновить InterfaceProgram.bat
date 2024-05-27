@@ -1,0 +1,1 @@
+pyuic5 interfaceProgram.ui -o interfaceProgram.py
