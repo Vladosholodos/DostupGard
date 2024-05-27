@@ -56,6 +56,7 @@ class MyWindow(QMainWindow):
         try:
             self.serial_port = serial.Serial('COM4', 9600, timeout=1)
             threading.Thread(target=self.read_from_serial, daemon=True).start()
+            self.ui.listWidget.addItem("Все работает в штатном режиме. Хорошего дня!")
         except serial.SerialException:
             self.ui.listWidget.addItem("Не удалось подключиться к порту COM4")
 
@@ -114,6 +115,21 @@ def add_data_to_database(data):
             cursor.execute(insert_query, data_to_insert)
             connection.commit()
             print("Данные успешно добавлены в базу данных")
+
+            # Получение текущего значения Внутри
+            uid = data
+            select_in_value_query = "SELECT Внутри FROM user_information WHERE uid = %s"
+            cursor.execute(select_in_value_query, (uid,))
+            current_in_value = cursor.fetchone()[0]
+            # Вычисление нового значения "in"
+            if current_in_value == 1:
+                new_in_value = 0
+            if current_in_value == 0:
+                new_in_value = 1
+            # Обновление значения "in"
+            update_in_value_query = "UPDATE user_information SET Внутри = %s WHERE uid = %s"
+            cursor.execute(update_in_value_query, (new_in_value, uid))
+            connection.commit()
 
     except Error as e:
         print(f"Ошибка: {e}")

@@ -1,0 +1,1 @@
+pyuic5 Stats2.ui -o Stats2.py
