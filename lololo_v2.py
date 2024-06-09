@@ -14,7 +14,6 @@ from Setting import Ui_Setting
 from Stats import Ui_stats_window
 from interfaceProgram import Ui_MainWindow
 
-
 class MyWindow(QMainWindow):
     def __init__(self):
         super().__init__()
