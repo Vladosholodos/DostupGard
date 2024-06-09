@@ -54,11 +54,11 @@ class MyWindow(QMainWindow):
 
     def start_reading(self):
         try:
-            self.serial_port = serial.Serial('COM4', 9600, timeout=1)
+            self.serial_port = serial.Serial('COM5', 9600, timeout=1)
             threading.Thread(target=self.read_from_serial, daemon=True).start()
             self.ui.listWidget.addItem("Все работает в штатном режиме. Хорошего дня!")
         except serial.SerialException:
-            self.ui.listWidget.addItem("Не удалось подключиться к порту COM4")
+            self.ui.listWidget.addItem("Не удалось подключиться к порту COM5")
 
     def stop_reading(self):
         self.can_add_to_list = False
@@ -231,7 +231,7 @@ class StatsWindow(QMainWindow):
         try:
             with connection.cursor() as cursor:
                 if selected_user == "Все":
-                    query = "SELECT Время, Код FROM work_information ORDER BY Время DESC"
+                    query = "SELECT wi.Время, ui.FIM_user FROM work_information wi JOIN user_information ui ON wi.Код = ui.uid"
                     cursor.execute(query)
 
                 if selected_user == "Внутри":
@@ -255,7 +255,7 @@ class StatsWindow(QMainWindow):
                     self.ui.statsTable.setRowCount(len(result))  # Устанавливаем количество строк
                     self.ui.statsTable.setColumnCount(2)  # Устанавливаем количество столбцов
                     self.ui.statsTable.setHorizontalHeaderLabels(
-                        ['Время', 'Событие'])  # Устанавливаем заголовки столбцов
+                        ['Время', 'Пользователь'])  # Устанавливаем заголовки столбцов
                     for row_index, row_data in enumerate(result):
                         formatted_time = datetime.datetime.strptime(str(row_data[0]), "%Y-%m-%d %H:%M:%S").strftime(
                             "%d-%m-%Y %H:%M:%S")
