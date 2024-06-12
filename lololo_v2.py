@@ -15,21 +15,19 @@ from Stats import Ui_stats_window
 from interfaceProgram import Ui_MainWindow
 
 
-# Люблю python
-
 class MyWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.ui = Ui_MainWindow()
-        self.ui.setupUi(self)
-        self.ui.OnButt.setText("Запустить")
-        self.is_running = False
-        self.can_add_to_list = False
-        self.serial_port = None
-        self.ui.OnButt.clicked.connect(self.toggle_reading)
-        self.ui.Setting_Button.clicked.connect(self.open_settings_window)
-        self.ui.stats_button.clicked.connect(self.open_stats_window)
-        self.stats_window = None
+        self.ui.setupUi(self)  # Инициализация главного окна
+        self.ui.OnButt.setText("Запустить")  # Текст дял кнопки
+        self.is_running = False  # Флаг запуска чтения порта
+        self.can_add_to_list = False  # Флаг возможности добавления записей в QListWidget
+        self.serial_port = None  # Флаг открытия порта
+        self.ui.OnButt.clicked.connect(self.toggle_reading)  # Функция при нажатии на кнопку "Запустить"
+        self.ui.Setting_Button.clicked.connect(self.open_settings_window)  # Функция при нажатии на кнопку "..."
+        self.ui.stats_button.clicked.connect(self.open_stats_window)  # Функция при нажатии на кнопку "Статистика"
+        self.stats_window = None  # Флаг окна статистики
 
         # Применить начальные настройки темы
         self.apply_theme()
@@ -71,10 +69,14 @@ class MyWindow(QMainWindow):
         while self.is_running and self.serial_port and self.serial_port.is_open:
             line = self.serial_port.readline().decode().strip()
             if line and self.can_add_to_list:
-                self.add_to_list(line)
-                # Добавляем данные в базу данных при каждом событии
-                add_data_to_database(line)
-                print(line)
+                if is_user_authorized(line):
+                    self.add_to_list(line)
+                    # Добавляем данные в базу данных при каждом событии
+                    add_data_to_database(line)
+                    print(line)
+                else:
+                    self.add_to_list(f"Неудачная попытка доступа: {line}")
+                    add_data_to_database(f"Неудачная попытка доступа: {line}")
 
     def add_to_list(self, data):
         current_time = QDateTime.currentDateTime().toString("yyyy-MM-dd HH:mm:ss")
@@ -95,6 +97,21 @@ class MyWindow(QMainWindow):
         self.ui.Setting_Button.setStyleSheet(f"background-color: {background_color}; color: {text_color};")
 
 
+def is_user_authorized(data):
+    connection = mysql.connector.connect(
+        host='localhost',
+        user='admin',
+        password='123qwe!@#QWE',
+        database='test'  # Название базы данных
+    )
+    cursor = connection.cursor()
+    cursor.execute("SELECT COUNT(*) FROM authorized_users WHERE uid = %s", (data,))
+    result = cursor.fetchone()[0]
+    cursor.close()
+    connection.close()
+    return result > 0
+
+
 def add_data_to_database(data):
     try:
         # Подключение к базе данных
@@ -113,25 +130,31 @@ def add_data_to_database(data):
             current_time = QDateTime.currentDateTime().toString("yyyy-MM-dd HH:mm:ss")
             data_to_insert = (current_time, data)
 
-            # Выполнение запроса
-            cursor.execute(insert_query, data_to_insert)
-            connection.commit()
-            print("Данные успешно добавлены в базу данных")
+            if is_user_authorized(data):
 
-            # Получение текущего значения Внутри
-            uid = data
-            select_in_value_query = "SELECT Внутри FROM user_information WHERE uid = %s"
-            cursor.execute(select_in_value_query, (uid,))
-            current_in_value = cursor.fetchone()[0]
-            # Вычисление нового значения "in"
-            if current_in_value == 1:
-                new_in_value = 0
-            if current_in_value == 0:
-                new_in_value = 1
-            # Обновление значения "in"
-            update_in_value_query = "UPDATE user_information SET Внутри = %s WHERE uid = %s"
-            cursor.execute(update_in_value_query, (new_in_value, uid))
-            connection.commit()
+                # Выполнение запроса
+                cursor.execute(insert_query, data_to_insert)
+                connection.commit()
+                print("Данные успешно добавлены в базу данных")
+
+                # Получение текущего значения Внутри
+                uid = data
+                select_in_value_query = "SELECT Внутри FROM user_information WHERE uid = %s"
+                cursor.execute(select_in_value_query, (uid,))
+                current_in_value = cursor.fetchone()[0]
+                # Вычисление нового значения "in"
+                if current_in_value == 1:
+                    new_in_value = 0
+                if current_in_value == 0:
+                    new_in_value = 1
+                # Обновление значения "in"
+                update_in_value_query = "UPDATE user_information SET Внутри = %s WHERE uid = %s"
+                cursor.execute(update_in_value_query, (new_in_value, uid))
+                connection.commit()
+            else:
+                insert_querys = "INSERT INTO work_information (Время, Код) VALUES (%s, %s)"
+                current_time = QDateTime.currentDateTime().toString("yyyy-MM-dd HH:mm:ss")
+                cursor.execute(insert_querys, (current_time, data))
 
     except Error as e:
         print(f"Ошибка: {e}")
@@ -148,16 +171,18 @@ class SettingsDialog(QDialog):
     def __init__(self, parent=None):
         super(SettingsDialog, self).__init__(parent)
         self.ui = Ui_Setting()
-        self.ui.setupUi(self)
+        self.ui.setupUi(self)  # Инициализация окна настроек
         self.ui.theme_combobox.currentIndexChanged.connect(self.change_theme)
         config = configparser.ConfigParser()
-        config.read('config.ini')
-        theme_type = config.get('Theme', 'theme', fallback='0')
-        background_color = config.get('Theme', 'Background_Color', fallback='#FFFFFF')
-        text_color = config.get('Theme', 'Text_Color', fallback='#000000')
-        self.ui.theme_combobox.setCurrentText("Светлая" if theme_type == '0' else "Темная")
-        self.apply_theme(theme_type, background_color, text_color)
-        MyWindow.apply_theme(parent)
+        config.read('config.ini')  # Функция чтения файла config.ini
+        theme_type = config.get('Theme', 'theme', fallback='0')  # Получение переменных из файла config.ini
+        background_color = config.get('Theme', 'Background_Color',
+                                      fallback='#FFFFFF')  # Получение переменной из файла config.ini
+        text_color = config.get('Theme', 'Text_Color', fallback='#000000')  # Получение переменной из файла config.ini
+        self.ui.theme_combobox.setCurrentText(
+            "Светлая" if theme_type == '0' else "Темная")  # Получение переменной из файла config.ini
+        self.apply_theme(theme_type, background_color, text_color)  # Вызов функции, которая применяет настройки темы
+        MyWindow.apply_theme(parent)  # Определение родительского окна "Главного окна"
 
     def change_theme(self, index):
         theme = '0' if index == 0 else '1'
@@ -201,9 +226,9 @@ class StatsWindow(QMainWindow):
         theme_type = config.get('Theme', 'theme', fallback='0')
         background_color = config.get('Theme', 'Background_Color', fallback='#FFFFFF')
         text_color = config.get('Theme', 'Text_Color', fallback='#000000')
-        self.apply_theme(theme_type, background_color, text_color)
+        self.apply_theme(background_color, text_color)
 
-    def apply_theme(self, theme_type, background_color, text_color):
+    def apply_theme(self, background_color, text_color):
         self.setStyleSheet(f"background-color: {background_color}; color: {text_color};")
         self.ui.statsTable.setStyleSheet(f"""
                QTableWidget {{
@@ -228,22 +253,22 @@ class StatsWindow(QMainWindow):
 
     def clickonstats(self):
         connection = pymysql.connect(host='localhost', user='admin', password='123qwe!@#QWE',
-                                     database='test')
+                                     database='test')  # Подключение к базе
         selected_user = self.ui.comboBox.currentText()
         try:
             with connection.cursor() as cursor:
-                if selected_user == "Все":
+                if selected_user == "Все":  # Параметр фильтрации "Все"
                     query = "SELECT wi.Время, ui.FIM_user FROM work_information wi JOIN user_information ui ON wi.Код = ui.uid"
                     cursor.execute(query)
 
-                if selected_user == "Внутри":
+                if selected_user == "Внутри":  # Параметр фильтрации "Внутри"
                     query = "SELECT FIM_user FROM user_information where Внутри = 1"
                     cursor.execute(query)
 
-                if selected_user != "Все" and selected_user != "Внутри":
+                if selected_user != "Все" and selected_user != "Внутри":  # Параметр фильтрации "*Пользователь*"
                     query = ("SELECT Время, Код FROM work_information "
                              "WHERE Код = (SELECT uid FROM user_information WHERE FIM_user = %s)"
-                             "ORDER BY Время DESC")
+                             "ORDER BY Время desc")
                     cursor.execute(query, (selected_user,))
 
                 result = cursor.fetchall()
@@ -280,7 +305,7 @@ class StatsWindow(QMainWindow):
                 self.ui.comboBox.clear()  # Очистка ComboBox перед добавлением новых элементов
 
                 for row in result:
-                    self.ui.comboBox.addItem(row[0])
+                    self.ui.comboBox.addItem(row[0])  # Добавление элементов из базы в combobox
 
         finally:
             connection.close()
